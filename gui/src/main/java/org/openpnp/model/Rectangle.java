@@ -22,7 +22,7 @@
 package org.openpnp.model;
 
 import org.simpleframework.xml.Attribute;
-
+import java.awt.Point;
 
 public class Rectangle {
 	@Attribute
@@ -75,5 +75,10 @@ public class Rectangle {
 
 	public void setHeight(int height) {
 		this.height = height;
+	}
+	
+	public Point getCenter() {
+		Point center = new Point((int)(x+(width/2)), (int)(y+(height/2)) );
+		return center;
 	}
 }
