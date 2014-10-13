@@ -1,0 +1,15 @@
+[
+  {
+    "op": "HoughCircles",
+    "name": "circles",
+    "diamMin": "{{diamMin}}",
+    "diamMax": "{{diamMax}}",
+    "show": "{{show}}"
+  },
+  {
+    "op": "points2resolution_RANSAC",
+    "name": "p2r_RANSAC",
+    "model": "circles",
+    "separation": "{{separation}}"
+  }
+]

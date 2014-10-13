@@ -1,0 +1,7 @@
+[
+  {"op":"threshold", 
+    "type":"{{type}}", 
+    "thresh":"{{thresh}}", 
+    "gray":"{{gray}}", 
+    "maxval":"{{maxval}}"} 
+]

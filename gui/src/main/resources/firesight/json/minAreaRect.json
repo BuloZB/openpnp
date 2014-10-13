@@ -1,0 +1,12 @@
+[
+  {"op":"minAreaRect",
+    "name":"singleBlob",
+    "min":"{{min}}",
+    "max":"{{max}}",
+    "channel":"{{channel}}"
+  },
+  {"op":"drawRects", 
+    "model":"singleBlob", 
+    "thickness":"{{thickness}}",
+    "color":"{{color}}"}
+]

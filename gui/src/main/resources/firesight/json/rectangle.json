@@ -1,0 +1,12 @@
+[
+  {"op":"rectangle", 
+    "fill":"{{fill}}", 
+    "flood":"{{flood}}", 
+    "width":"{{width}}", 
+    "height":"{{height}}",
+    "color":"{{color}}",
+    "x":"{{x}}",
+    "y":"{{y}}",
+    "thickness":"{{thickness}}"
+    }
+]
