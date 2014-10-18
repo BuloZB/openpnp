@@ -1,5 +1,5 @@
 /*
- 	Copyright (C) 2013 Richard Spelling <openpnp@chebacco.com>
+ 	Copyright (C) 2011 Jason von Nieda <jason@vonnieda.org>
  	
  	This file is part of OpenPnP.
  	
@@ -17,8 +17,7 @@
     along with OpenPnP.  If not, see <http://www.gnu.org/licenses/>.
  	
  	For more information about OpenPnP visit http://openpnp.org
- */
-
+*/
 
 package org.openpnp.gui.tablemodel;
 
@@ -28,19 +27,17 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import org.openpnp.ConfigurationListener;
+import org.openpnp.gui.support.HeadCellValue;
 import org.openpnp.model.Configuration;
 import org.openpnp.spi.Head;
 import org.openpnp.spi.Nozzle;
 import org.openpnp.spi.NozzleTip;
-import org.openpnp.machine.zippy.ZippyMachine;
-import org.openpnp.machine.zippy.ZippyNozzle;
-import org.openpnp.machine.zippy.ZippyNozzleTip;
 
 public class NozzleTipsTableModel extends AbstractTableModel {
 	final private Configuration configuration;
 	
-	private String[] columnNames = new String[] { "Id", "Type", "Loaded" };
-	private List<ZippyNozzleTip> zippynozzletips;
+	private String[] columnNames = new String[] { "Id", "Nozzle", "Head" };
+	private List<NozzleTipWrapper> nozzleTips;
 
 	public NozzleTipsTableModel(Configuration configuration) {
 		this.configuration = configuration;
@@ -49,18 +46,6 @@ public class NozzleTipsTableModel extends AbstractTableModel {
                 refresh();
             }
         });
-	}
-
-	public void refresh() { //pulls list of nozzle tips on machine
-		zippynozzletips = new ArrayList<ZippyNozzleTip>(); //new empty list for nozzle tips
-		for (Head head : configuration.getMachine().getHeads()) { //for each head
-			for (Nozzle nozzle : head.getNozzles()) { //for each nozzle
-				for (NozzleTip nozzletip : nozzle.getNozzleTips()) { //for each nozzletip
-					zippynozzletips.add((ZippyNozzleTip) nozzletip); //add to list from above
-				}
-			}
-		}
-		fireTableDataChanged();
 	}
 
 	@Override
@@ -73,81 +58,68 @@ public class NozzleTipsTableModel extends AbstractTableModel {
 	}
 
 	public int getRowCount() {
-		return (zippynozzletips == null) ? 0 : zippynozzletips.size();
+		return (nozzleTips == null) ? 0 : nozzleTips.size();
 	}
 	
-	public NozzleTip getNozzleTip(int index) {
-		return zippynozzletips.get(index);
+    public NozzleTip getNozzleTip(int index) {
+        return nozzleTips.get(index).nozzleTip;
+    }
+    
+    public Nozzle getNozzle(int index) {
+        return nozzleTips.get(index).nozzle;
+    }
+	
+	public void refresh() {
+	    nozzleTips = new ArrayList<NozzleTipWrapper>();
+		for (Head head : Configuration.get().getMachine().getHeads()) {
+		    for (Nozzle nozzle : head.getNozzles()) {
+		        for (NozzleTip nozzleTip : nozzle.getNozzleTips()) {
+	                nozzleTips.add(new NozzleTipWrapper(nozzleTip, nozzle));
+		        }
+		    }
+		}
+		fireTableDataChanged();
 	}
 	
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return columnIndex == 2;
-	}
-	
-	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		try {
-			if (columnIndex == 2) {
-				//find already loaded nozzletip
-				for(ZippyNozzleTip nt : zippynozzletips){ //for each nozzletip in the list
-					if(nt.isLoaded()){
-						ZippyNozzle parent_nozzle = null;
-						for (Head head : configuration.getMachine().getHeads()) { //for each head
-							for (Nozzle nozzle : head.getNozzles()) { //for each nozzle
-								for (NozzleTip temp_nozzletip : nozzle.getNozzleTips()) { //for each nozzletip
-									if(temp_nozzletip.getId() == nt.getId()) //get parent nozzle object
-										parent_nozzle = (ZippyNozzle) nozzle;
-								}
-							}
-						}
-						nt.unload(parent_nozzle);
-//						nt.setLoaded(false);
-						
-					}
-				}
-				ZippyNozzleTip nt = zippynozzletips.get(rowIndex);
-				//iterate through config and find parent nozzle.
-				//assumes unique nozzle tip name
-				ZippyNozzle parent_nozzle = null;
-				for (Head head : configuration.getMachine().getHeads()) { //for each head
-					for (Nozzle nozzle : head.getNozzles()) { //for each nozzle
-						for (NozzleTip temp_nozzletip : nozzle.getNozzleTips()) { //for each nozzletip
-							if(temp_nozzletip.getId() == nt.getId())
-								parent_nozzle = (ZippyNozzle) nozzle;
-						}
-					}
-				}
-				//load this nozzletip
-				nt.load(parent_nozzle);
-//				nt.setLoaded(true);
-			}
-			configuration.setDirty(true);
-		}
-		catch (Exception e) {
-			// TODO: dialog, bad input
-		}
+	    return false;
 	}
 	
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		if (columnIndex == 2) {
-			return Boolean.class;
+		if (columnIndex == 1) {
+			return HeadCellValue.class;
 		}
 		return super.getColumnClass(columnIndex);
 	}
 
-	public Object getValueAt(int row, int col) { //just fills in table on left
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+	}
+	
+	public Object getValueAt(int row, int col) {
+	    NozzleTipWrapper nozzleTipWrapper = nozzleTips.get(row);
 		switch (col) {
 		case 0:
-			return zippynozzletips.get(row).getId();
+			return nozzleTipWrapper.nozzleTip.getId();
 		case 1:
-			return zippynozzletips.get(row).getClass().getSimpleName();
-		case 2:
-			return ((ZippyNozzleTip) zippynozzletips.get(row)).isLoaded();
+		    return nozzleTipWrapper.nozzle.getId();
+        case 2:
+            return new HeadCellValue(nozzleTipWrapper.nozzle.getHead());
+			
 		default:
 			return null;
 		}
-		
+	}
+	
+	class NozzleTipWrapper {
+        public NozzleTip nozzleTip;
+        public Nozzle nozzle;
+        
+	    public NozzleTipWrapper(NozzleTip nozzleTip, Nozzle nozzle) {
+	        this.nozzleTip = nozzleTip;
+	        this.nozzle = nozzle;
+	    }
 	}
 }

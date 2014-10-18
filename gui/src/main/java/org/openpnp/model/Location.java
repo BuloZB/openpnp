@@ -135,7 +135,8 @@ public class Location {
 	 */
 	public Location add(Location l) {
 		l = l.convertToUnits(getUnits());
-		return new Location(l.getUnits(), x + l.getX(), y + l.getY(), z + l.getZ(), getRotation());
+//		return new Location(l.getUnits(), x + l.getX(), y + l.getY(), z + l.getZ(), rotation + l.getRotation());
+		return new Location(l.getUnits(), x + l.getX(), y + l.getY(), z + l.getZ(), rotation);
 	}
 
 	/**
@@ -210,7 +211,7 @@ public class Location {
 	
 	@Override
 	public String toString() {
-		return String.format("units %s, x %f, y %f, z %f, rotation %f", units, x, y, z, rotation);
+		return String.format("units %s, x %f, y %f, z %f, rotation %f", units.getShortName(), x, y, z, rotation);
 	}
 
     /**

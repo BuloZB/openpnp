@@ -21,7 +21,6 @@
 
 package org.openpnp.machine.zippy;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,11 +29,13 @@ import org.openpnp.spi.Nozzle;
 
 public class ZippyHead extends ReferenceHead {
 
-	@Override
+
+
+    @Override
 	public void home() throws Exception {
 		logger.debug("{}.home()", getId());
 	    driver.home(this);
-	    ((ZippyNozzle) nozzles.get(0)).setAlreadyCompensatedNozzleTip(false);
+	    ((ZippyNozzle) nozzles.get(0)).clearAppliedOffset();
 	    
 	    machine.fireMachineHeadActivity(this);
 	}
