@@ -23,9 +23,13 @@ package org.firepick;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+import org.openpnp.gui.support.PropertySheetWizardAdapter;
 import org.openpnp.gui.support.Wizard;
+import org.openpnp.gui.wizards.CameraConfigurationWizard;
 import org.openpnp.machine.reference.ReferenceCamera;
 import org.openpnp.model.Configuration;
+import org.openpnp.spi.PropertySheetHolder;
+import org.openpnp.spi.PropertySheetHolder.PropertySheet;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.core.Commit;
@@ -36,6 +40,7 @@ import java.lang.ref.SoftReference;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+import javax.swing.Action;
 
 import java.io.File;
 
@@ -176,4 +181,30 @@ public class FireFuseCamera extends ReferenceCamera implements Runnable {
 	public Wizard getConfigurationWizard() {
 		return null;
 	}
+
+    @Override
+    public String getPropertySheetHolderTitle() {
+        return getClass().getSimpleName() + " " + getId();
+    }
+
+    @Override
+    public PropertySheetHolder[] getChildPropertySheetHolders() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public PropertySheet[] getPropertySheets() {
+        return new PropertySheet[] {
+                new PropertySheetWizardAdapter(new CameraConfigurationWizard(this)),
+                new PropertySheetWizardAdapter(getConfigurationWizard())
+        };
+    }
+    
+    @Override
+    public Action[] getPropertySheetHolderActions() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
