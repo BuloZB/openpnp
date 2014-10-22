@@ -105,7 +105,8 @@ public class FireSightVisionProvider implements VisionProvider {
         
     }
 
-    private JSONResult callFireSight(File imageInput, 
+    //https://github.com/firepick1/FireSight/wiki/firesight
+    public JSONResult callFireSight(File imageInput, 
     		                          File imageOutput, 
     		                          File jsonInput, 
     		                          File jsonOutput,
@@ -116,15 +117,15 @@ public class FireSightVisionProvider implements VisionProvider {
     	//Build the command --------------------------------
     	List<String> cmdLine = new ArrayList<String>();
     	cmdLine.add(FireSightCmd);
-    	cmdLine.add("-i");
+    	cmdLine.add("-i"); // image-file-path Optional input image.
     	cmdLine.add(imageInput.toString());
-    	cmdLine.add("-o");
+    	cmdLine.add("-o"); // output-image-path Optional output image path.
     	cmdLine.add(imageOutput.toString());
-    	cmdLine.add("-p");
+    	cmdLine.add("-p"); // JSON-pipeline-file-path  
     	cmdLine.add(jsonInput.toString());
     	for (int i=0;i<params.size();i++)
     	{
-    		cmdLine.add("-D" + params.get(i));
+    		cmdLine.add("-D" + params.get(i)); // Define value for a pipeline parameter 
     	}
     	
     	//Build process and run --------------------------------

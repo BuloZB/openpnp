@@ -96,6 +96,7 @@ public class FireFuseCamera extends ReferenceCamera implements Runnable {
 	private synchronized void initialize() throws Exception {
 		stop();
 		sourceUrl = new URL(sourceUri);
+		//TODO: Use file.createTempFile();
 		cacheDirectory = new File(Configuration.get().getResourceDirectory(getClass()), DigestUtils.shaHex(sourceUri));
 		if (!cacheDirectory.exists()) {
 			cacheDirectory.mkdirs();
