@@ -110,7 +110,7 @@ public class MainFrame extends JFrame {
 	public static JobPanel jobPanel;
 	public static MachinePanel machinePanel;
 	public static CamerasPanel camerasPanel;
-	public static BoardsPanel boardsPanel;
+//	public static BoardsPanel boardsPanel;
 	public static HeadsPanel headsPanel;
 	public static ActuatorsPanel actuatorsPanel;
 	public static CameraPanel cameraPanel;
@@ -171,7 +171,7 @@ public class MainFrame extends JFrame {
 		packagesPanel = new PackagesPanel(configuration, this);
 		feedersPanel = new FeedersPanel(configuration);
 		camerasPanel = new CamerasPanel(this, configuration);
-		boardsPanel = new BoardsPanel(configuration);
+//		boardsPanel = new BoardsPanel(configuration);
 		headsPanel = new HeadsPanel(this, configuration, machineControlsPanel);
 		actuatorsPanel = new ActuatorsPanel(configuration);
         nozzlesPanel = new NozzlesPanel(this, configuration);
@@ -429,7 +429,7 @@ public class MainFrame extends JFrame {
 				});
 
 		panelBottom.addTab("Job", null, jobPanel, null);
-		panelBottom.addTab("Boards", null, boardsPanel, null);
+//		panelBottom.addTab("Boards", null, boardsPanel, null);
 		panelBottom.addTab("Parts", null, partsPanel, null);
 		panelBottom.addTab("Packages", null, packagesPanel, null);
 		panelBottom.addTab("Feeders", null, feedersPanel, null);
@@ -597,19 +597,26 @@ public class MainFrame extends JFrame {
 									+ "\n\nPlease check your configuration and try again.");
 			return false;
 		}
-		if (!boardsPanel.checkForModifications()) {
-			return false;
-		}
+//		if (!boardsPanel.checkForModifications()) {
+//			return false;
+//		}
 		if (!jobPanel.checkForModifications()) {
 			return false;
 		}
-		// Attempt to stop the machine on quit
-		try {
-			configuration.getMachine().setEnabled(false);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+        // Attempt to stop the machine on quit
+        try {
+            configuration.getMachine().setEnabled(false);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Attempt to stop the machine on quit
+        try {
+            configuration.getMachine().close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 		System.exit(0);
 		return true;
 	}

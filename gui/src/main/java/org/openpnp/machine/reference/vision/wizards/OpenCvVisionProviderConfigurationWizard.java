@@ -17,25 +17,31 @@
     along with OpenPnP.  If not, see <http://www.gnu.org/licenses/>.
  	
  	For more information about OpenPnP visit http://openpnp.org
- */
+*/
 
-package org.openpnp.model.outline;
+package org.openpnp.machine.reference.vision.wizards;
 
-import org.openpnp.model.LengthUnit;
-import org.openpnp.model.Outline;
-import org.simpleframework.xml.Attribute;
+import javax.swing.JPanel;
 
-public abstract class AbstractOutline implements Outline {
-	@Attribute
-	protected LengthUnit units = LengthUnit.Millimeters;
+import org.openpnp.gui.support.AbstractConfigurationWizard;
+import org.openpnp.machine.reference.vision.OpenCvVisionProvider;
+import javax.swing.JLabel;
 
-	@Override
-    public LengthUnit getUnits() {
-		return units;
+@SuppressWarnings("serial")
+public class OpenCvVisionProviderConfigurationWizard extends AbstractConfigurationWizard {
+	private final OpenCvVisionProvider visionProvider;
+
+	private JPanel panelGeneral;
+
+	public OpenCvVisionProviderConfigurationWizard(
+			OpenCvVisionProvider visionProvider) {
+		this.visionProvider = visionProvider;
+		
+		JLabel lblOpencvvisionproviderconfigurationwizardPlaceholder = new JLabel("OpenCvVisionProviderConfigurationWizard Placeholder");
+		contentPanel.add(lblOpencvvisionproviderconfigurationwizardPlaceholder);
 	}
 
 	@Override
-    public void setUnits(LengthUnit units) {
-		this.units = units;
+	public void createBindings() {
 	}
 }

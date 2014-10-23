@@ -31,7 +31,6 @@ import org.openpnp.model.Board.Side;
 import org.openpnp.model.Configuration;
 import org.openpnp.model.Location;
 import org.openpnp.model.Placement;
-import org.openpnp.model.Point;
 import org.openpnp.spi.Camera;
 import org.openpnp.spi.Head;
 import org.openpnp.util.MovableUtils;
@@ -54,10 +53,10 @@ public class TwoPlacementBoardLocationProcess {
 	
 	private int step = -1;
 	private String[] instructions = new String[] {
-		"<html><body>Move the camera's crosshairs to the center of an easily identifiable placement near the top left corner of the board. Click Next to continue.</body></html>",			
-		"<html><body>Now select the placement you have targetted from the table below. Click Next to continue.</body></html>",			
-		"<html><body>Next, move the camera's crosshairs to the center of a second placement near the bottom right corner of the board. Click Next to continue.</body></html>",			
-		"<html><body>And select the placement you have targetted from the table below. Click Next to continue.</body></html>",
+        "<html><body>Select an easily identifiable placement from the table below. It should be near the left edge of the board. Click Next to continue.</body></html>",          
+		"<html><body>Now, line up the camera's crosshairs with the center of the selected placement. Click Next to continue.</body></html>",			
+        "<html><body>Next, select a second placement from the table below. It should be near the right edge of the board. Click Next to continue.</body></html>",
+		"<html><body>Finally, line up the camera's crosshairs with the center of the selecter placement. Click Next to continue.</body></html>",			
 		"<html><body>The board's location and rotation has been set. Click Finish to position the camera at the board's origin, or Cancel to quit.</body></html>",
 	};
 	
@@ -107,7 +106,16 @@ public class TwoPlacementBoardLocationProcess {
 		}
 	}
 	
-	private boolean step1() {
+    private boolean step1() {
+        placementA = jobPanel.getSelectedPlacement();
+        if (placementA == null) {
+            MessageBoxes.errorBox(mainFrame, "Error", "Please select a placement.");
+            return false;
+        }
+        return true;
+    }
+    
+	private boolean step2() {
 		visionA = MainFrame.cameraPanel.getSelectedCameraLocation();
 		if (visionA == null) {
 			MessageBoxes.errorBox(mainFrame, "Error", "Please position the camera.");
@@ -116,74 +124,40 @@ public class TwoPlacementBoardLocationProcess {
 		return true;
 	}
 	
-	private boolean step2() {
-		placementA = jobPanel.getSelectedPlacement();
-		if (placementA == null) {
-			MessageBoxes.errorBox(mainFrame, "Error", "Please select a placement.");
-			return false;
-		}
-		return true;
-	}
-	
 	private boolean step3() {
-		visionB = MainFrame.cameraPanel.getSelectedCameraLocation();
-		if (visionB == null) {
-			MessageBoxes.errorBox(mainFrame, "Error", "Please position the camera.");
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Given two placements and Locations where they have been located in
-	 * machine coordinates, return the machine coordinates and angle of the
-	 * origin of the two placements.
-	 * @param placement1
-	 * @param placement2
-	 * @param vision1
-	 * @param vision2
-	 * @return
-	 */
-	private static Location calculateAngleAndOffset(Location placement1, Location placement2, Location vision1, Location vision2, boolean mirror) {
-        // If the placements are on the Bottom of the board we need to invert X
-        if (mirror) {
-            placement1 = placement1.invert(true, false, false, false);
-            placement2 = placement2.invert(true, false, false, false);
+        placementB = jobPanel.getSelectedPlacement();
+        if (placementB == null || placementB == placementA) {
+            MessageBoxes.errorBox(mainFrame, "Error", "Please select a second placement.");
+            return false;
         }
         
-        Point pPlacement1 = placement1.convertToUnits(Configuration.get().getSystemUnits()).getXyPoint();
-        Point pPlacement2 = placement2.convertToUnits(Configuration.get().getSystemUnits()).getXyPoint();
-        Point pVision1 = vision1.convertToUnits(Configuration.get().getSystemUnits()).getXyPoint();
-        Point pVision2 = vision2.convertToUnits(Configuration.get().getSystemUnits()).getXyPoint();
-
-        double angle = Math.toDegrees(Math.atan2(pVision1.y - pVision2.y, pVision1.x - pVision2.x)
-                - Math.atan2(pPlacement1.y - pPlacement2.y, pPlacement1.x - pPlacement2.x));
-        
-        Point rotatedPlacement = Utils2D.rotatePoint(pPlacement1, angle);
-        
-        Point offset = Utils2D.translatePoint(pVision1, -rotatedPlacement.x, -rotatedPlacement.y);
-
-        return new Location(Configuration.get().getSystemUnits(), offset.getX(), offset.getY(), 0, angle);
+        if (placementA.getSide() != placementB.getSide()) {
+            MessageBoxes.errorBox(mainFrame, "Error", "Both placements must be on the same side of the board.");
+            return false;
+        }
+		return true;
 	}
 	
 	private boolean step4() {
-		placementB = jobPanel.getSelectedPlacement();
-		if (placementB == null || placementB == placementA) {
-			MessageBoxes.errorBox(mainFrame, "Error", "Please select a second placement.");
-			return false;
-		}
+        visionB = MainFrame.cameraPanel.getSelectedCameraLocation();
+        if (visionB == null) {
+            MessageBoxes.errorBox(mainFrame, "Error", "Please position the camera.");
+            return false;
+        }
 		
-		if (placementA.getSide() != placementB.getSide()) {
-			MessageBoxes.errorBox(mainFrame, "Error", "Both placements must be on the same side of the board.");
-			return false;
-		}
+        // If the placements are on the Bottom of the board we need to invert X
+		Location placementALocation = placementA.getLocation();
+		Location placementBLocation = placementB.getLocation();
+        if (placementA.getSide() == Side.Bottom) {
+            placementALocation = placementALocation.invert(true, false, false, false);
+            placementBLocation = placementBLocation.invert(true, false, false, false);
+        }
 		
-		Location boardLocation = calculateAngleAndOffset(
-		        placementA.getLocation(), 
-		        placementB.getLocation(), 
+		Location boardLocation = Utils2D.calculateAngleAndOffset(
+		        placementALocation, 
+		        placementBLocation, 
 		        visionA,
-		        visionB,
-		        placementA.getSide() == Side.Bottom);
+		        visionB);
         
 		Location oldBoardLocation = jobPanel.getSelectedBoardLocation().getLocation();
 		oldBoardLocation = oldBoardLocation.convertToUnits(boardLocation.getUnits());

@@ -26,6 +26,9 @@ import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -54,6 +57,8 @@ import org.openpnp.ConfigurationListener;
 import org.openpnp.JobProcessorDelegate;
 import org.openpnp.JobProcessorListener;
 import org.openpnp.gui.components.AutoSelectTextTable;
+import org.openpnp.gui.components.reticle.OutlineReticle;
+import org.openpnp.gui.components.reticle.Reticle;
 import org.openpnp.gui.importer.BoardImporter;
 import org.openpnp.gui.processes.TwoPlacementBoardLocationProcess;
 import org.openpnp.gui.support.ActionGroup;
@@ -72,7 +77,7 @@ import org.openpnp.model.Job;
 import org.openpnp.model.Location;
 import org.openpnp.model.Part;
 import org.openpnp.model.Placement;
-import org.openpnp.model.Point;
+import org.openpnp.model.outline.ComplexOutline;
 import org.openpnp.spi.Camera;
 import org.openpnp.spi.Feeder;
 import org.openpnp.spi.JobProcessor;
@@ -121,7 +126,7 @@ public class JobPanel extends JPanel {
 		this.configuration = configuration;
 		this.frame = frame;
 		this.machineControlsPanel = machineControlsPanel;
-
+		
 		jobSaveActionGroup = new ActionGroup(saveJobAction, saveJobAsAction);
 		jobSaveActionGroup.setEnabled(false);
 
@@ -191,8 +196,24 @@ public class JobPanel extends JPanel {
 						}
 						placementSelectionActionGroup
 								.setEnabled(getSelectedPlacement() != null);
+						Placement placement = getSelectedPlacement();
+						if (placement != null) {
+                            Reticle reticle = new OutlineReticle(placement.getPart().getPackage().getOutline());
+						    MainFrame.cameraPanel.getSelectedCameraView().setReticle(JobPanel.this.getClass().getName(), reticle);
+						}
+						else {
+                            MainFrame.cameraPanel.getSelectedCameraView().removeReticle(JobPanel.this.getClass().getName());
+						}
 					}
 				});
+		
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                MainFrame.cameraPanel.getSelectedCameraView().removeReticle(JobPanel.this.getClass().getName());
+            }
+        });
+
 
 		setLayout(new BorderLayout(0, 0));
 
@@ -368,8 +389,23 @@ public class JobPanel extends JPanel {
 					.get(index);
 		}
 	}
-
+	
+	/**
+	 * Checks if there are any modifications that need to be saved. Prompts the
+	 * user if there are. Returns true if it's okay to exit. 
+	 * @return
+	 */
 	public boolean checkForModifications() {
+	    if (!checkForBoardModifications()) {
+	        return false;
+	    }
+	    if (!checkForJobModifications()) {
+	        return false;
+	    }
+	    return true;
+	}
+
+	private boolean checkForJobModifications() {
 		if (jobProcessor.getJob().isDirty()) {
 			Job job = jobProcessor.getJob();
 			String name = (job.getFile() == null ? UNTITLED_JOB_FILENAME : job
@@ -387,7 +423,38 @@ public class JobPanel extends JPanel {
 		}
 		return true;
 	}
-
+	
+    private boolean checkForBoardModifications() {
+        for (Board board : configuration.getBoards()) {
+            if (board.isDirty()) {
+                int result = JOptionPane
+                        .showConfirmDialog(
+                                getTopLevelAncestor(),
+                                "Do you want to save your changes to "
+                                        + board.getFile().getName()
+                                        + "?"
+                                        + "\n"
+                                        + "If you don't save, your changes will be lost.",
+                                "Save " + board.getFile().getName() + "?",
+                                JOptionPane.YES_NO_CANCEL_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    try {
+                        configuration.saveBoard(board);
+                    }
+                    catch (Exception e) {
+                        MessageBoxes.errorBox(getTopLevelAncestor(),
+                                "Board Save Error", e.getMessage());
+                        return false;
+                    }
+                }
+                else if (result == JOptionPane.CANCEL_OPTION) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+	
 	private boolean saveJob() {
 		if (jobProcessor.getJob().getFile() == null) {
 			return saveJobAs();
