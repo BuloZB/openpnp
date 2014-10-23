@@ -25,11 +25,13 @@
 
 package org.firepick;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeoutException;
 
 import javax.swing.Action;
 
@@ -306,7 +308,18 @@ public class MarlinDriver extends AbstractSerialPortDriver implements Runnable {
 	//Serial receive thread
 	public void run() {
 		while (!disconnectRequested) {
-			String line = readLine().trim(); //Returns a line from the serial port
+            String line;
+            try {
+                line = readLine().trim();
+            }
+            catch (TimeoutException ex) {
+                continue;
+            }
+            catch (IOException e) {
+                logger.error("Read error", e);
+                return;
+            }
+            line = line.trim();
 			logger.debug(line);
 			responseQueue.offer(line);
 			if (line.equals("ok") || line.startsWith("error: ")) {
