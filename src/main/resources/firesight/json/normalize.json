@@ -1,0 +1,9 @@
+[
+  {"op":"normalize",
+    "normType":"{{normType}}",
+    "domain":"{{domain}}",
+    "range":"{{range}}",
+    "alpha":"{{alpha}}",
+    "beta":"{{beta}}"
+  }
+]

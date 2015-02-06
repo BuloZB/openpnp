@@ -1,0 +1,54 @@
+<openpnp-machine>
+   <machine class="org.openpnp.machine.reference.ReferenceMachine">
+      <heads>
+         <head class="org.openpnp.machine.reference.ReferenceHead" id="H1">
+            <nozzles>
+               <nozzle class="org.openpnp.machine.reference.ReferenceNozzle" id="N1" pick-dwell-milliseconds="0" place-dwell-milliseconds="0">
+                  <nozzletips/>
+                  <head-offsets units="Millimeters" x="10.0" y="0.0" z="0.0" rotation="0.0"/>
+                  <nozzle-tip class="org.openpnp.machine.reference.ReferenceNozzleTip" id="NT1" allow-incompatible-packages="true">
+                     <compatible-package-ids class="java.util.ArrayList"/>
+                  </nozzle-tip>
+               </nozzle>
+               <nozzle class="org.openpnp.machine.reference.ReferenceNozzle" id="N2" pick-dwell-milliseconds="0" place-dwell-milliseconds="0">
+                  <nozzletips/>
+                  <head-offsets units="Millimeters" x="20.0" y="0.0" z="0.0" rotation="0.0"/>
+                  <nozzle-tip class="org.openpnp.machine.reference.ReferenceNozzleTip" id="NT2" allow-incompatible-packages="true">
+                     <compatible-package-ids class="java.util.ArrayList"/>
+                  </nozzle-tip>
+               </nozzle>
+            </nozzles>
+            <actuators>
+               <actuator class="org.openpnp.machine.reference.ReferenceActuator" id="A1" index="0">
+                  <head-offsets units="Millimeters" x="10.0" y="10.0" z="0.0" rotation="0.0"/>
+               </actuator>
+            </actuators>
+            <cameras>
+               <camera class="org.openpnp.machine.reference.camera.TableScannerCamera" id="C1" looking="Down" fps="24">
+                  <units-per-pixel units="Millimeters" x="0.030745" y="0.030813" z="0.0" rotation="0.0"/>
+                  <vision-provider class="org.openpnp.machine.reference.vision.OpenCvVisionProvider"/>
+                  <head-offsets units="Millimeters" x="20.0" y="10.0" z="0.0" rotation="0.0"/>
+                  <source-uri>http://openpnp.org/downloads/tablescan/1/</source-uri>
+               </camera>
+               <camera class="org.firepick.FireFuseCamera" id="C2" looking="Down" fps="1">
+                  <units-per-pixel units="Millimeters" x="0.030745" y="0.030813" z="0.0" rotation="0.0"/>
+                  <vision-provider class="org.firepick.FireSightVisionProvider"/>
+                  <head-offsets units="Millimeters" x="20.0" y="10.0" z="0.0" rotation="0.0"/>
+                  <source-uri>http://10.0.1.4:8080/firerest/cv/1/camera.jpg</source-uri>
+               </camera>
+            </cameras>
+         </head>
+      </heads>
+      <feeders>
+         <feeder class="org.openpnp.machine.reference.feeder.ReferenceTrayFeeder" id="F1" enabled="false" part-id="C-0805-100NF" tray-count-x="1" tray-count-y="1" feed-count="0">
+            <location units="Millimeters" x="0.0" y="0.0" z="0.0" rotation="0.0"/>
+            <offsets units="Millimeters" x="0.0" y="0.0" z="0.0" rotation="0.0"/>
+         </feeder>
+      </feeders>
+      <cameras/>
+      <job-planner class="org.openpnp.planner.SimpleJobPlanner"/>
+      <job-processor class="org.openpnp.machine.reference.ReferenceJobProcessor"/>
+      <driver class="org.firepick.MarlinDriver" port-name="COM5" baud="115200" feed-rate-mm-per-minute="3000.0"/>
+      <!-- <driver class="org.openpnp.machine.reference.driver.NullDriver" feed-rate-mm-per-minute="3500.0"/> -->
+   </machine>
+</openpnp-machine>

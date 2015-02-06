@@ -1,0 +1,13 @@
+[
+	{"op":"matchTemplate",
+		"name":"match",
+		"template":"{{template}}",
+		"corr":"{{corr}}",
+		"threshold":"{{threshold}}",
+		"method":"{{method}}",
+		"angle":"{{angle }}",
+		"output":"{{output}}"
+	},
+	{"op":"drawRects", "model":"match", "color":[32,255,32]},
+	{"op":"matchGrid", "model":"match" }
+]

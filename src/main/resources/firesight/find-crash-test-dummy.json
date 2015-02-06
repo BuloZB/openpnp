@@ -1,0 +1,14 @@
+[
+  {
+    "op": "matchTemplate",
+    "name": "fiducial",
+    "corr": "{{corr}}",
+    "template": "{{img}}",
+    "threshold": "{{threshold}}"
+  },
+  {
+    "op": "drawRects",
+    "model": "fiducial",
+    "color": "{{rectColor}}"
+  }
+]

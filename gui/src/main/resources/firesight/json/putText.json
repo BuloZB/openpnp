@@ -1,0 +1,11 @@
+[
+  {"op":"putText", 
+    "text":"{{text||FireSight}}", 
+    "org":"{{org}}",
+    "fontScale":"{{fontScale}}", 
+    "thickness":"{{thickness}}", 
+    "color":"{{color}}",
+    "fontFace":"{{fontFace}}",
+    "italic":"{{italic}}"
+    }
+]

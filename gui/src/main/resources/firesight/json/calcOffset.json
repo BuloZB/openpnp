@@ -1,0 +1,13 @@
+[
+  {"op":"calcOffset", 
+    "name":"calcOffset-stage", 
+    "minval":"{{minval}}",
+    "roi":"{{roi}}",
+    "xtol":"{{xtol}}",
+    "ytol":"{{ytol}}",
+    "channels":"{{channels}}", 
+    "offsetColor":"{{offsetColor}}", 
+    "template":"{{template}}"
+  },
+  {"op":"drawRects", "model":"calcOffset-stage", "color":[32,255,32]}
+]
