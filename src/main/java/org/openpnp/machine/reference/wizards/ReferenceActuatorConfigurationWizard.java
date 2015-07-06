@@ -23,7 +23,6 @@ package org.openpnp.machine.reference.wizards;
 
 import java.awt.Color;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -54,11 +53,7 @@ public class ReferenceActuatorConfigurationWizard extends
     public ReferenceActuatorConfigurationWizard(ReferenceActuator actuator) {
         this.actuator = actuator;
 
-        JPanel panelFields = new JPanel();
-        panelFields.setLayout(new BoxLayout(panelFields, BoxLayout.Y_AXIS));
-
         panelOffsets = new JPanel();
-        panelFields.add(panelOffsets);
         panelOffsets.setBorder(new TitledBorder(new EtchedBorder(
                 EtchedBorder.LOWERED, null, null), "Offsets",
                 TitledBorder.LEADING, TitledBorder.TOP, null,
